@@ -1,6 +1,6 @@
 {
   "name": "@industry-theme/excalidraw-panels",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Excalidraw diagram editor and list panels for Principal ADE - create, edit, and manage diagrams stored in Alexandria Memory Palace",
   "type": "module",
   "main": "dist/panels.bundle.js",
