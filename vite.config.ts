@@ -27,8 +27,19 @@ export default defineConfig(({ mode }) => ({
       formats: ['es'],
     },
     rollupOptions: {
-      // Externalize peer dependencies - these come from the host application
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      // Externalize peer dependencies - these come from the host application.
+      // @excalidraw/excalidraw (~69MB) and industry-theme are shipped by the
+      // host; bundling our own copies would bloat the panel and break the
+      // shared theme-context singleton. panel-framework-core is type-only.
+      // Regex tails so subpath imports (e.g. CSS) are externalized too.
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        /^@excalidraw\/excalidraw(\/.*)?$/,
+        /^@principal-ade\/industry-theme(\/.*)?$/,
+        /^@principal-ade\/panel-framework-core(\/.*)?$/,
+      ],
       output: {
         globals: {
           react: 'React',
