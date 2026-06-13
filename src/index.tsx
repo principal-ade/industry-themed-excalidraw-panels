@@ -20,7 +20,7 @@ import {
  * Export array of panel definitions.
  * This is the required export for panel extensions.
  */
-export const panels: PanelDefinition[] = [
+export const panels: PanelDefinition<any, any>[] = [
   {
     metadata: {
       id: 'principal-ade.excalidraw-editor',

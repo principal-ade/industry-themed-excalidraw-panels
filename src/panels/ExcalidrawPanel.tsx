@@ -11,7 +11,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Pencil, Plus, ArrowLeft } from 'lucide-react';
 import { useTheme } from '@principal-ade/industry-theme';
-import type { PanelComponentProps } from '../types';
+import type { PanelActions, PanelComponentProps, FileTreeContext } from '../types';
 import { ExcalidrawWrapper } from '../components/ExcalidrawWrapper';
 import { useExcalidrawStorage } from '../hooks/useExcalidrawStorage';
 import {
@@ -25,11 +25,9 @@ import type { ExcalidrawDiagramData, DiagramListItem } from '../types/excalidraw
 /**
  * ExcalidrawPanel - Main editor panel component
  */
-export const ExcalidrawPanel: React.FC<PanelComponentProps> = ({
-  context,
-  actions,
-  events,
-}) => {
+export const ExcalidrawPanel: React.FC<
+  PanelComponentProps<PanelActions, FileTreeContext>
+> = ({ context, actions, events }) => {
   const { theme } = useTheme();
   const storage = useExcalidrawStorage(context);
 

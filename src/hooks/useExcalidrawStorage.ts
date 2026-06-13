@@ -11,10 +11,12 @@
  * - adapters.deleteFile: (path: string) => Promise<void>
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import type { PanelContextValue } from '@principal-ade/panel-framework-core';
-import type { FileTree } from '@principal-ai/repository-abstraction';
+import type {
+  PanelContextValue,
+  FileTreeContext,
+} from '@principal-ade/panel-framework-core';
 import type {
   ExcalidrawDiagramData,
   DiagramListItem,
@@ -57,7 +59,7 @@ export interface UseExcalidrawStorageResult {
  * Diagram name is stored in data.appState.name
  */
 export function useExcalidrawStorage(
-  context: PanelContextValue
+  context: PanelContextValue<FileTreeContext>
 ): UseExcalidrawStorageResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -87,9 +89,8 @@ export function useExcalidrawStorage(
         Promise.resolve(context.adapters!.fileSystem!.deleteFile(path))
     : undefined;
 
-  // Get fileTree slice for listing diagrams
-  const fileTreeSlice = context.getSlice<FileTree>('fileTree');
-  const fileTree = fileTreeSlice?.data;
+  // Get fileTree slice for listing diagrams (typed context field)
+  const fileTree = context.fileTree?.data;
 
   // Check if storage is available (need read, write, and a repository path)
   const isStorageAvailable = useMemo(() => {

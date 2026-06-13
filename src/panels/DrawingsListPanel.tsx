@@ -12,7 +12,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Pencil, Trash2, Clock, Plus, Copy, Search, X } from 'lucide-react';
 import { useTheme } from '@principal-ade/industry-theme';
-import type { PanelComponentProps } from '../types';
+import type { PanelActions, PanelComponentProps, FileTreeContext } from '../types';
 import { useExcalidrawStorage } from '../hooks/useExcalidrawStorage';
 import {
   DIAGRAM_EVENTS,
@@ -24,11 +24,9 @@ import type { DiagramListItem } from '../types/excalidraw';
 /**
  * DrawingsListPanel - Diagram browser panel component
  */
-export const DrawingsListPanel: React.FC<PanelComponentProps> = ({
-  context,
-  actions,
-  events,
-}) => {
+export const DrawingsListPanel: React.FC<
+  PanelComponentProps<PanelActions, FileTreeContext>
+> = ({ context, actions, events }) => {
   const { theme } = useTheme();
   const storage = useExcalidrawStorage(context);
 

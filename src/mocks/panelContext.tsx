@@ -8,18 +8,12 @@ import type {
   PanelEvent,
   PanelEventType,
   DataSlice,
+  FileTreeContext,
 } from '../types';
 import type { FileTree } from '@principal-ai/repository-abstraction';
 
-/**
- * Mock Git Status data for Storybook
- */
-const mockGitStatusData = {
-  staged: ['src/components/Button.tsx', 'src/styles/theme.css'],
-  unstaged: ['README.md', 'package.json'],
-  untracked: ['src/new-feature.tsx'],
-  deleted: [],
-};
+/** Context shape provided to the Excalidraw panels */
+type ExcalidrawPanelContext = FileTreeContext;
 
 /**
  * Mock FileTree data with allFiles for Excalidraw panels
@@ -224,53 +218,17 @@ const createMockSlice = <T,>(
 
 /**
  * Mock Panel Context for Storybook
+ *
+ * As of panel-framework-core 0.5.1, the dynamic slice API (`slices` Map,
+ * `getSlice`, `hasSlice`, etc.) has been removed. Slices are now exposed as
+ * direct, typed context fields (e.g. `context.fileTree`).
  */
 export const createMockContext = (
-  overrides?: Partial<PanelContextValue>
-): PanelContextValue => {
+  overrides?: Partial<PanelContextValue<ExcalidrawPanelContext>>
+): PanelContextValue<ExcalidrawPanelContext> => {
   const mockAdapters = createMockAdapters();
 
-  // Create mock data slices
-  const mockSlices = new Map<string, DataSlice>([
-    ['git', createMockSlice('git', mockGitStatusData)],
-    [
-      'markdown',
-      createMockSlice('markdown', [
-        {
-          path: 'README.md',
-          title: 'Project README',
-          lastModified: Date.now() - 3600000,
-        },
-        {
-          path: 'docs/API.md',
-          title: 'API Documentation',
-          lastModified: Date.now() - 86400000,
-        },
-      ]),
-    ],
-    ['fileTree', createMockSlice('fileTree', mockFileTreeData)],
-    [
-      'packages',
-      createMockSlice('packages', [
-        { name: 'react', version: '19.0.0', path: '/node_modules/react' },
-        {
-          name: 'typescript',
-          version: '5.0.4',
-          path: '/node_modules/typescript',
-        },
-      ]),
-    ],
-    [
-      'quality',
-      createMockSlice('quality', {
-        coverage: 85,
-        issues: 3,
-        complexity: 12,
-      }),
-    ],
-  ]);
-
-  const defaultContext: PanelContextValue = {
+  const defaultContext: PanelContextValue<ExcalidrawPanelContext> = {
     currentScope: {
       type: 'repository',
       workspace: {
@@ -282,38 +240,9 @@ export const createMockContext = (
         path: '/Users/developer/my-project',
       },
     },
-    slices: mockSlices,
     adapters: mockAdapters,
-    getSlice: <T,>(name: string): DataSlice<T> | undefined => {
-      return mockSlices.get(name) as DataSlice<T> | undefined;
-    },
-    getWorkspaceSlice: <T,>(name: string): DataSlice<T> | undefined => {
-      const slice = mockSlices.get(name);
-      return slice?.scope === 'workspace'
-        ? (slice as DataSlice<T>)
-        : undefined;
-    },
-    getRepositorySlice: <T,>(name: string): DataSlice<T> | undefined => {
-      const slice = mockSlices.get(name);
-      return slice?.scope === 'repository'
-        ? (slice as DataSlice<T>)
-        : undefined;
-    },
-    hasSlice: (name: string, scope?: 'workspace' | 'repository'): boolean => {
-      const slice = mockSlices.get(name);
-      if (!slice) return false;
-      if (!scope) return true;
-      return slice.scope === scope;
-    },
-    isSliceLoading: (
-      name: string,
-      scope?: 'workspace' | 'repository'
-    ): boolean => {
-      const slice = mockSlices.get(name);
-      if (!slice) return false;
-      if (scope && slice.scope !== scope) return false;
-      return slice.loading;
-    },
+    // Typed context slice (replaces dynamic getSlice('fileTree'))
+    fileTree: createMockSlice('fileTree', mockFileTreeData),
     refresh: async (
       scope?: 'workspace' | 'repository',
       slice?: string
@@ -391,8 +320,10 @@ export const createMockEvents = (): PanelEventEmitter => {
  * Wraps components with mock context and ThemeProvider for Storybook
  */
 export const MockPanelProvider: React.FC<{
-  children: (props: PanelComponentProps) => React.ReactNode;
-  contextOverrides?: Partial<PanelContextValue>;
+  children: (
+    props: PanelComponentProps<PanelActions, ExcalidrawPanelContext>
+  ) => React.ReactNode;
+  contextOverrides?: Partial<PanelContextValue<ExcalidrawPanelContext>>;
   actionsOverrides?: Partial<PanelActions>;
 }> = ({ children, contextOverrides, actionsOverrides }) => {
   const context = createMockContext(contextOverrides);
@@ -406,7 +337,9 @@ export const MockPanelProvider: React.FC<{
  * Mock Panel Provider with no repository (for testing empty states)
  */
 export const MockPanelProviderNoRepo: React.FC<{
-  children: (props: PanelComponentProps) => React.ReactNode;
+  children: (
+    props: PanelComponentProps<PanelActions, ExcalidrawPanelContext>
+  ) => React.ReactNode;
 }> = ({ children }) => {
   const context = createMockContext({
     currentScope: {

@@ -24,6 +24,9 @@ export type {
   PanelContextValue,
   PanelComponentProps,
 
+  // Typed context slices (replaces dynamic getSlice access)
+  FileTreeContext,
+
   // Panel definition
   PanelMetadata,
   PanelLifecycleHooks,

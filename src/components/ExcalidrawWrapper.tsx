@@ -224,7 +224,7 @@ export const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
     if (isDeletedRef.current || !onSave) return;
 
     const { excalidrawAPI, currentLibraryItems } = saveDataRef.current;
-    let { diagramName } = saveDataRef.current;
+    const { diagramName } = saveDataRef.current;
 
     if (!excalidrawAPI) return;
 
